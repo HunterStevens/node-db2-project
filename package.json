@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "knex": "^0.21.1",
-    "sqlite3": "^4.2.0"
+    "sqlite3": "^4.2.0",
+    "uuid": "^8.0.0"
   },
   "repository": {
     "type": "git",

@@ -3,6 +3,7 @@ const server = express();
 const knex = require('knex');
 const knexfile = require('../knexfile');
 const db = require('../data/dbConnection');
+const {v4: uuid} = require('uuid');
 
 server.use(express.json());
 
@@ -16,36 +17,52 @@ server.get("/", (req,res) =>{
 })
 
 server.post('/', validateForm, (req,res) =>{
-    db('cars').insert(req.body)
-    .then(newCar =>{
-        console.log(newCar);
+    const newCar = req.body;
+    newCar.VIN = uuid();
+    db('cars').insert(newCar)
+    .then(count =>{
+        console.log(count);
         db('cars').then(vehicles=>{
             res.status(200).json({data:vehicles})
         })
         .catch(err=>{
-            res.status(500).json({message:err});
+            res.status(500).json({message:"Get cars error", err});
         })
     })
     .catch(err =>{
-        res.status(500).json({message:err});
+        res.status(500).json({message:"Insert new car error", err});
     })
 })
 
-server.get('/:id', (req,res) =>{
+server.get('/:id', validateID, (req,res) =>{
 
 })
 
-server.put('/:id', (req,res) =>{
+server.put('/:id', validateID, validateForm, (req,res) =>{
     
 })
 
-server.delete('/:id', (req,res) =>{
+server.delete('/:id', validateID, (req,res) =>{
     
 })
+
+function validateID(req,res,next){
+    const {id} = req.params;
+    db('cars').where(id)
+    .then(([theCar]) =>{
+        req.user = theCar;
+        if(theCar){
+            next();
+        }else{
+            res.status(404).json({error:"that car with the id does not exist."});
+        }
+
+    })
+}
 
 function validateForm(req,res,next){
-    const {make, model, milage}=req.body;
-    if(make && model && milage){
+    const {make, model, mileage}=req.body;
+    if(make && model && mileage){
         next();
     }
     else{
