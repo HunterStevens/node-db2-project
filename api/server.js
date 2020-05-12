@@ -35,7 +35,7 @@ server.post('/', validateForm, (req,res) =>{
 })
 
 server.get('/:id', validateID, (req,res) =>{
-
+    res.status(200).json(req.user);
 })
 
 server.put('/:id', validateID, validateForm, (req,res) =>{
@@ -47,9 +47,9 @@ server.delete('/:id', validateID, (req,res) =>{
 })
 
 function validateID(req,res,next){
-    const {id} = req.params;
-    db('cars').where(id)
+    db('cars').where({id : req.params.id})
     .then(([theCar]) =>{
+        console.log(theCar);
         req.user = theCar;
         if(theCar){
             next();
